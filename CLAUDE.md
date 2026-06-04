@@ -4,29 +4,33 @@ This file provides strict guidance and architectural rules for Claude Code (clau
 
 ## Commands & Tooling
 
-- **Package Manager:** You MUST strictly use `{{PACKAGE_MANAGER}}`. Never use other package managers in this repo.
-- **Maintain the Build:** Never leave the codebase in a state where build or linting fails. Run the relevant commands below to verify your work before concluding a task.
+- **Toolchain:** Rust is pinned via `rust-toolchain.toml` (channel = `stable`). Every contributor automatically gets the latest stable toolchain on first `cargo` invocation. Required components: `rustfmt`, `clippy`.
+- **Maintain the Build:** Never leave the codebase in a state where build, lint, or tests fail. Run the relevant commands below to verify your work before concluding a task.
 
-<!-- TODO: Replace this code block with the commands actually used in this repo. -->
 ```bash
-{{INSTALL_CMD}}     # Install dependencies
-{{DEV_CMD}}         # Start dev server
-{{BUILD_CMD}}       # Production build
-{{LINT_CMD}}        # Lint check
-{{FORMAT_CMD}}      # Format with auto-write
-{{TEST_CMD}}        # Run tests (delete this line if not applicable)
+cargo build --workspace                                                # Build all crates
+cargo watch -x 'check --workspace'                                     # Dev loop (requires cargo-watch)
+cargo build --workspace --release                                      # Release build
+cargo clippy --workspace --all-targets --all-features -- -D warnings   # Lint
+cargo fmt --all                                                        # Format (check-only: `cargo fmt --all -- --check`)
+cargo nextest run --workspace                                          # Tests (fallback: cargo test --workspace)
+cargo deny check                                                       # Licenses + advisories
+cargo audit                                                            # CVE check
 ```
 
-## Architecture & Framework Rules
+Install the auxiliary tools once per machine:
 
-<!-- TODO: Describe the framework / runtime constraints for this project. -->
-**Framework:** This project strictly uses {{FRAMEWORK}}.
+```bash
+cargo install --locked cargo-nextest cargo-watch cargo-deny cargo-audit
+```
 
-<!-- TODO: Delete this whole "Styling Conventions" block if the project has no design system. -->
-### Styling Conventions
+## Architecture & Workspace Rules
 
-- **Design Tokens:** CSS custom properties follow the `{{DESIGN_TOKEN_PREFIX}}` naming scheme (e.g. `var(--{{TOKEN_EXAMPLE}})`). Active theme CSS lives in `{{THEME_CSS_PATH}}`.
-- **Typography & Scaling:** Base font size is `{{BASE_FONT_SIZE}}`; `rem` units scale from this base. Available font tokens: {{FONT_TOKENS}}.
+**Layout:** Cargo workspace, edition `2021`. New code goes in a crate under `crates/<name>/`. The workspace root `Cargo.toml` declares `members = ["crates/*"]` and centralizes shared metadata under `[workspace.package]` and shared dependencies under `[workspace.dependencies]`.
+
+**Crate inheritance:** Crate manifests inherit shared keys from the workspace using `<key>.workspace = true` (e.g. `edition.workspace = true`, `license.workspace = true`). Shared dependencies are referenced as `<crate> = { workspace = true }`.
+
+**MSRV:** Pinned in `clippy.toml` and `[workspace.package].rust-version`. Do not bump it incidentally.
 
 ## Behavioral Guidelines
 
@@ -75,5 +79,5 @@ Use your file-reading capabilities to read the exact rules in the `.claude/` dir
 - **Testing/Verifying:** Read `.claude/testing-requirements.md`
 - **Opening PRs:** Read `.claude/pr-guidelines.md`
 - **Creating new files:** Read `.claude/file-naming.md`
-- **Building a component:** Read `.claude/component-workflow.md`
+- **Building a crate or module:** Read `.claude/crate-workflow.md`
 - **Deciding what to build next / branching strategy:** Read `.claude/execution-order.md`

@@ -1,44 +1,54 @@
 # Directories and File Naming
 
-## Source directories (`src/`)
+## Workspace layout
 
 | Path | Contents |
 |------|----------|
-| `src/components/` | Generated components |
-| `src/components/styled/` | Shared Styled Component definitions |
-| `src/configs/` | Global static config (color tokens, etc.) |
-| `src/models/` | Shared TypeScript interfaces/types |
-| `src/lib/` | Shared Utilities |
+| `Cargo.toml` | Workspace root manifest. Defines `members = ["crates/*"]` and `[workspace.dependencies]`. |
+| `rust-toolchain.toml` | Pins the toolchain channel for every contributor. |
+| `rustfmt.toml` / `clippy.toml` / `deny.toml` | Tooling configuration. |
+| `crates/<name>/` | One directory per crate. |
+| `target/` | Build output. Git-ignored. |
 
-## Within each `src/<component>/` directory
+## Per-crate layout
 
-| Folder | Contents |
-|--------|----------|
-| `src/components/styled/` | Styled Component definitions |
-| `src/configs/` | Static config (color tokens, etc.) |
-| `src/models/` | TypeScript interfaces/types |
-| `src/lib/` | Utilities |
+| Path | Contents |
+|------|----------|
+| `crates/<name>/Cargo.toml` | Crate manifest. Inherits shared keys from the workspace via `<key>.workspace = true`. |
+| `crates/<name>/src/lib.rs` | Library entrypoint. Public API + crate-level `//!` docs. |
+| `crates/<name>/src/main.rs` | Binary entrypoint (for `--bin` crates). |
+| `crates/<name>/src/<module>.rs` | Submodules. |
+| `crates/<name>/tests/` | Integration tests. One file per feature; each compiles as a separate binary. |
+| `crates/<name>/benches/` | Benchmarks (Criterion or built-in `#[bench]`). Optional. |
+| `crates/<name>/examples/` | Runnable examples. `cargo run --example <name>`. |
 
-## File naming conventions
+## Naming conventions
 
-<!-- TODO: Verify these conventions match this project. Adjust the table or replace examples. -->
+| Item | Convention | Example |
+|------|------------|---------|
+| Crate directory | `kebab-case` | `crates/data-store` |
+| Crate identifier (in code) | `snake_case` | `use data_store::…` |
+| Files / modules | `snake_case.rs` | `user_repository.rs` |
+| Types, traits, enums | `PascalCase` | `UserRepository`, `RepoError` |
+| Functions, methods, locals | `snake_case` | `find_by_id`, `db_pool` |
+| Constants, statics | `SCREAMING_SNAKE_CASE` | `MAX_RETRIES` |
+| Lifetime parameters | short `'lowercase` | `'a`, `'src` |
+| Type parameters | short `PascalCase` | `T`, `K`, `Ctx` |
 
-| File type | Convention | Example |
-|-----------|-----------|---------|
-| Components | `camelCase.tsx` | `unorderedList.tsx` |
-| Component CSS (plain CSS, not a library) | `[name].styled.css` in `src/components/styled/` | `button.styled.css` |
-| Config objects | `camelCase.ts` | `socialIconsParallaxConfiguration.ts` |
-| TypeScript models | `[name].model.ts` / `[name].model.tsx` | `button.model.ts`, `button.model.tsx` |
-| Utilities | `[name].utility.ts` / `[name].utility.tsx` | `button.utility.ts`, `button.utility.tsx` |
+## Module declaration pattern
 
-## CSS import pattern
+Submodules are declared in the parent module (`lib.rs` or another `mod.rs`-style
+file). Prefer one file per module over `<module>/mod.rs`:
 
-Each component imports its own CSS as a side-effect at the top of the `.tsx` file:
-
-```tsx
-import './styled/button.styled.css';
+```rust
+// crates/data-store/src/lib.rs
+pub mod repository;
+pub mod error;
 ```
 
-<!-- TODO: Delete this paragraph if the project does not use a design token system. -->
-CSS files live in `{{STYLED_DIR}}` and use {{DESIGN_TOKEN_SYSTEM}} custom properties
-(e.g. `var(--{{TOKEN_EXAMPLE}})`) exclusively. No hardcoded color values.
+```text
+crates/data-store/src/
+├── lib.rs
+├── repository.rs
+└── error.rs
+```
