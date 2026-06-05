@@ -27,21 +27,21 @@ Follow the [Conventional Commits](https://www.conventionalcommits.org/) specific
 | `perf` | Performance improvement |
 | `revert` | Reverts a previous commit |
 
-Append `!` after the type for breaking changes: `feat!: drop Node 16 support`.
+Append `!` after the type for breaking changes: `feat!: bump MSRV to 1.85`.
 
 ## Scopes (optional but recommended)
 
-Use the route or layer being changed: `auth`, `api`, `ui`, `db`, `config`, `infra`.
+Use the crate name or layer being changed: `<crate-name>`, `workspace`, `ci`, `deps`, `config`.
 
 ## Examples
 
 ```
-feat(ui): add dropdown component with keyboard navigation
-fix(auth): redirect loop when session cookie is expired
-refactor(api): extract pagination logic into utility
-chore: upgrade linter to latest
-docs: update CLAUDE.md with branching strategy
-feat!: replace session cookie with JWT-only flow
+feat(data-store): add async batch insert API
+fix(http-client): retry budget leak under timeout
+refactor(workspace): move shared error type into errors crate
+chore(deps): bump tokio to 1.40
+docs: document MSRV policy in CLAUDE.md
+feat!: bump MSRV to 1.85
 ```
 
 ## What to avoid
