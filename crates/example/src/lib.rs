@@ -26,6 +26,9 @@ pub fn greet(name: &str) -> String {
 
 #[cfg(test)]
 mod tests {
+    // Test code is exempt from the unwrap/expect ban; see .claude/code-review.md.
+    #![allow(clippy::unwrap_used, clippy::expect_used)]
+
     use super::*;
 
     #[test]
