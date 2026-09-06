@@ -25,9 +25,7 @@ Keep it under 72 characters.
 
 - One logical change per PR, in **one commit**; split unrelated work into separate PRs
 - Branch from an up-to-date `main`, so no rebase is needed before review
-- All lint checks must pass: `cargo clippy --workspace --all-targets --all-features -- -D warnings`
-- `cargo build --workspace` must succeed before marking the PR ready for review
-- `cargo nextest run --workspace` must pass (or `cargo test --workspace`)
+- `just ci` must pass before the branch is pushed — all four gates, zero warnings
 - Link to the relevant section in CLAUDE.md or a `.claude/` rule file if the PR establishes a new pattern
 
 ## Size guidance

@@ -2,12 +2,19 @@
 
 ## Before merging any change
 
-- [ ] `cargo fmt --all -- --check`
-- [ ] `cargo clippy --workspace --all-targets --all-features -- -D warnings`
-- [ ] `cargo nextest run --workspace`  *(falls back to `cargo test --workspace` if nextest is not installed)*
-- [ ] `cargo deny check` *(licenses + advisories)*
+```bash
+just ci
+```
 
-All four must pass before marking a PR ready for review.
+That runs the four gates in order:
+
+- [ ] `just fmt-check` — formatting is clean
+- [ ] `just lint` — clippy, warnings as errors
+- [ ] `just test` — nextest *(falls back to `cargo test` if not installed)* plus doc-tests
+- [ ] `just deny` — licenses + advisories
+
+All four must pass before pushing the branch. The underlying cargo commands live
+in the `justfile`; call the recipe rather than copying them.
 
 ## Test layout
 

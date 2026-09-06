@@ -20,7 +20,7 @@ git pull --ff-only
 git switch -c <type>/<short-description>
 
 # 3. Make the change, then run the gates
-just ci                              # or the four commands in .claude/testing-requirements.md
+just ci                              # all four gates; see .claude/testing-requirements.md
 
 # 4. One commit (format: .claude/commit-conventions.md)
 git add <the files this change touches>

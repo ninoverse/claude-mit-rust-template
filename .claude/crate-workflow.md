@@ -44,12 +44,20 @@ name = "<name>"
 version = "0.1.0"
 edition.workspace = true
 license.workspace = true
+repository.workspace = true
 rust-version.workspace = true
 
 [dependencies]
 # Shared deps come from the workspace:
 # serde = { workspace = true }
+
+[lints]
+workspace = true
 ```
+
+The `[lints]` table is **not** optional. Without it the crate silently opts out
+of the workspace lints in `Cargo.toml` and `-D warnings` will not catch a
+missing doc comment or an `unwrap()` in a non-test path.
 
 ### 3. `crates/<name>/src/lib.rs` (or `main.rs`)
 
@@ -69,6 +77,9 @@ Inline at the bottom of the file under test:
 ```rust
 #[cfg(test)]
 mod tests {
+    // Test code is exempt from the unwrap/expect ban; see .claude/code-review.md.
+    #![allow(clippy::unwrap_used, clippy::expect_used)]
+
     use super::*;
 
     #[test]
@@ -77,6 +88,10 @@ mod tests {
     }
 }
 ```
+
+The inner `#![allow(...)]` is what makes the exemption real. `unwrap_used` and
+`expect_used` are set workspace-wide and fire in test targets too, so without it
+a `.unwrap()` in a test fails the clippy gate.
 
 ### 6. Integration tests + doc tests
 
@@ -98,13 +113,10 @@ other-crate = { path = "../other-crate" }
 
 ### 8. Verification gate
 
-All four must pass, with zero warnings, before committing:
+All four gates must pass, with zero warnings, before committing:
 
 ```bash
-cargo fmt --all -- --check
-cargo clippy --workspace --all-targets --all-features -- -D warnings
-cargo nextest run --workspace        # falls back to `cargo test --workspace`
-cargo deny check
+just ci
 ```
 
 ### 9. Commit + push + hand over the PR

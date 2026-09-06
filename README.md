@@ -9,7 +9,9 @@ files already wired up.
 
 | File | Purpose |
 |------|---------|
-| `Cargo.toml` | Workspace root. `members = ["crates/*"]`, shared `[workspace.package]` and `[workspace.dependencies]`. |
+| `Cargo.toml` | Workspace root. `members = ["crates/*"]`, shared `[workspace.package]`, `[workspace.dependencies]` and `[workspace.lints]`. |
+| `justfile` | Task runner. Canonical form of every command; CI and the rules call these recipes. |
+| `.cargo/config.toml` | Cargo aliases mirroring the justfile, plus a commented faster-linker block. |
 | `rust-toolchain.toml` | Pins channel = `stable` so every contributor auto-pulls the latest stable Rust. |
 | `rustfmt.toml` | Format config (edition 2024, 100-col, module-granular imports). |
 | `clippy.toml` | MSRV pin for clippy lints. |
@@ -32,29 +34,38 @@ rm -rf .git && git init
 #    - [workspace.package].repository
 #    - [workspace.package].license (if not MIT)
 
-# 3. Install the auxiliary Rust tools (once per machine)
-cargo install --locked cargo-nextest cargo-watch cargo-deny cargo-audit
+# 3. Install the task runner and auxiliary tools (once per machine)
+cargo install --locked just
+just setup
 
 # 4. Add your first crate, then drop the placeholder
-cargo new --lib crates/<your-crate>
+just new-crate <your-crate>
 rm -rf crates/example
 
 # 5. Verify the toolchain and workspace
-cargo check --workspace
-cargo clippy --workspace --all-targets -- -D warnings
-cargo nextest run --workspace
+just ci
 ```
 
 ## Daily commands
 
+The `justfile` is the single source of truth for every command — CI and the
+`.claude/` rules call these recipes rather than repeating cargo invocations.
+
 ```bash
-cargo build --workspace
-cargo watch -x 'check --workspace'
-cargo clippy --workspace --all-targets --all-features -- -D warnings
-cargo fmt --all
-cargo nextest run --workspace
-cargo deny check
+just            # list every recipe
+just ci         # all four merge gates — run before every commit
+just build      # build all crates
+just check      # type-check, faster than build
+just watch      # re-check on save
+just fmt        # format in place
+just test       # nextest (or cargo test) plus doc-tests
+just doc        # build and open workspace docs
+just audit      # CVE check
 ```
+
+No `just`? `.cargo/config.toml` defines `cargo lint`, `cargo fmt-check` and
+`cargo check-all`. There is no `cargo ci` equivalent — a cargo alias can only
+wrap a single subcommand, so run the four gates in sequence.
 
 ## Rule files
 
