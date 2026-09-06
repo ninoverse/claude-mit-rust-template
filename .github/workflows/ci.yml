@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# One in-flight run per ref. A new push supersedes the previous run.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  # Fail on warnings from rustc itself, matching the clippy gate.
+  RUSTFLAGS: -D warnings
+
+jobs:
+  # The four gates from .claude/testing-requirements.md, one job each so a
+  # failure names the gate that broke. Each calls the justfile recipe rather
+  # than repeating the cargo invocation.
+  fmt:
+    name: Gate 1 — fmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - uses: taiki-e/install-action@just
+      - run: just fmt-check
+
+  lint:
+    name: Gate 2 — clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@just
+      - run: just lint
+
+  test:
+    name: Gate 3 — tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@just
+      - uses: taiki-e/install-action@nextest
+      - run: just test
+
+  deny:
+    name: Gate 4 — licenses and advisories
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@cargo-deny
+      - uses: taiki-e/install-action@just
+      - run: just deny
+
+  # rust-toolchain.toml says `stable`, so nothing else here would catch a change
+  # that breaks the rust-version promised in Cargo.toml.
+  msrv:
+    name: MSRV 1.85
+    runs-on: ubuntu-latest
+    env:
+      # rust-toolchain.toml would otherwise win and silently test stable instead.
+      # RUSTUP_TOOLCHAIN takes precedence over the toolchain file.
+      RUSTUP_TOOLCHAIN: "1.85"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.85
+      - uses: Swatinem/rust-cache@v2
+      - name: Show the toolchain actually in use
+        run: rustc --version
+      - name: Check the workspace builds on the declared MSRV
+        run: cargo check --workspace --all-targets --locked
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@cargo-llvm-cov
+      - name: Generate HTML coverage report
+        run: cargo llvm-cov --workspace --all-features --html
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: target/llvm-cov/html/
+          retention-days: 14
