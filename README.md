@@ -11,11 +11,12 @@ files already wired up.
 |------|---------|
 | `Cargo.toml` | Workspace root. `members = ["crates/*"]`, shared `[workspace.package]` and `[workspace.dependencies]`. |
 | `rust-toolchain.toml` | Pins channel = `stable` so every contributor auto-pulls the latest stable Rust. |
-| `rustfmt.toml` | Format config (edition 2021, 100-col, module-granular imports). |
+| `rustfmt.toml` | Format config (edition 2024, 100-col, module-granular imports). |
 | `clippy.toml` | MSRV pin for clippy lints. |
 | `deny.toml` | `cargo-deny` config: allowed licenses, advisory denials, source restrictions. |
 | `.gitignore` | Ignores `target/`. |
-| `crates/` | Empty workspace member dir — add crates here via `cargo new --lib crates/<name>`. |
+| `crates/` | Workspace member dir — add crates here via `cargo new --lib crates/<name>`. |
+| `crates/example/` | Placeholder crate. A workspace with zero members is a hard cargo error, so this keeps the gates green on a fresh clone. Delete it *after* adding your first real crate. |
 | `CLAUDE.md` | Top-level rules surfaced to Claude Code. |
 | `.claude/*.md` | Per-task rule files (see table below). |
 
@@ -34,8 +35,9 @@ rm -rf .git && git init
 # 3. Install the auxiliary Rust tools (once per machine)
 cargo install --locked cargo-nextest cargo-watch cargo-deny cargo-audit
 
-# 4. Add your first crate
+# 4. Add your first crate, then drop the placeholder
 cargo new --lib crates/<your-crate>
+rm -rf crates/example
 
 # 5. Verify the toolchain and workspace
 cargo check --workspace
