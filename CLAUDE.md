@@ -36,6 +36,11 @@ Without `just`, `.cargo/config.toml` defines `cargo lint`, `cargo fmt-check` and
 `cargo check-all`. There is no `cargo ci` — a cargo alias can only wrap one
 subcommand, so the four gates have to be run in sequence.
 
+**Automation:** `.claude/settings.json` allowlists these commands so they do not
+prompt, runs `rustfmt` on every `.rs` file you edit, and warns if the workspace
+stops compiling when a turn ends. Formatting is therefore already handled — do
+not run `cargo fmt` after each edit.
+
 ## Architecture & Workspace Rules
 
 **Layout:** Cargo workspace, edition `2024`. New code goes in a crate under `crates/<name>/`. The workspace root `Cargo.toml` declares `members = ["crates/*"]` and centralizes shared metadata under `[workspace.package]` and shared dependencies under `[workspace.dependencies]`.
@@ -86,6 +91,8 @@ subcommand, so the four gates have to be run in sequence.
 Use your file-reading capabilities to read the exact rules in the `.claude/` directory **before** executing any of the following tasks:
 
 - **Any change that ends in a PR:** Read `.claude/git-flow.md` **first** — it defines the branch → commit → PR loop everything else fits inside
+- **Adding a crate:** `/new-crate <name>` runs the `.claude/crate-workflow.md` checklist
+- **Checking your work:** `/gates` reports which of the four merge gates pass
 - **Committing code:** Read `.claude/commit-conventions.md`
 - **Creating branches:** Read `.claude/branch-naming.md`
 - **Reviewing PRs:** Read `.claude/code-review.md`

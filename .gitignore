@@ -1,2 +1,6 @@
 /target
 **/*.rs.bk
+
+# Personal Claude Code overrides. .claude/settings.json is committed and shared;
+# this is the per-developer counterpart and must not be.
+.claude/settings.local.json
