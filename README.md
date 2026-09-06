@@ -26,6 +26,8 @@ files already wired up.
 | `crates/example/` | Placeholder crate. A workspace with zero members is a hard cargo error, so this keeps the gates green on a fresh clone. Delete it *after* adding your first real crate. |
 | `CLAUDE.md` | Top-level rules surfaced to Claude Code. |
 | `.claude/*.md` | Per-task rule files (see table below). |
+| `.claude/settings.json` | Permission allowlist + hooks: rustfmt on save, `cargo check` when Claude stops. |
+| `.claude/commands/` | Project slash commands: `/gates`, `/new-crate`. |
 
 ## Bootstrap a project from this template
 
