@@ -1,5 +1,8 @@
 # Claude Code Rust Template
 
+[![CI](https://github.com/ninoverse/claude-mit-rust-template/actions/workflows/ci.yml/badge.svg)](https://github.com/ninoverse/claude-mit-rust-template/actions/workflows/ci.yml)
+[![Audit](https://github.com/ninoverse/claude-mit-rust-template/actions/workflows/audit.yml/badge.svg)](https://github.com/ninoverse/claude-mit-rust-template/actions/workflows/audit.yml)
+
 Claude Code configuration scaffolding for **Rust cargo-workspace** projects.
 Fork or copy this repo to start a new Rust project that ships with the latest
 stable toolchain, opinionated lint/format/test commands, and Claude Code rule
@@ -12,6 +15,8 @@ files already wired up.
 | `Cargo.toml` | Workspace root. `members = ["crates/*"]`, shared `[workspace.package]`, `[workspace.dependencies]` and `[workspace.lints]`. |
 | `justfile` | Task runner. Canonical form of every command; CI and the rules call these recipes. |
 | `.cargo/config.toml` | Cargo aliases mirroring the justfile, plus a commented faster-linker block. |
+| `.github/workflows/ci.yml` | The four gates as separate jobs, plus an MSRV job and a coverage artifact. |
+| `.github/workflows/audit.yml` | Weekly `cargo audit` + `cargo deny check advisories` on a cron. |
 | `rust-toolchain.toml` | Pins channel = `stable` so every contributor auto-pulls the latest stable Rust. |
 | `rustfmt.toml` | Format config (edition 2024, 100-col, module-granular imports). |
 | `clippy.toml` | MSRV pin for clippy lints. |
