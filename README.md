@@ -60,6 +60,7 @@ cargo deny check
 
 | File | Purpose |
 |------|---------|
+| `.claude/git-flow.md` | The branch → commit → PR loop. One branch in flight, no stacked PRs |
 | `.claude/branch-naming.md` | Branch prefix and format conventions |
 | `.claude/commit-conventions.md` | Conventional Commits rules |
 | `.claude/pr-guidelines.md` | PR title, description template, size guidance |
@@ -67,4 +68,4 @@ cargo deny check
 | `.claude/file-naming.md` | Workspace and per-crate layout |
 | `.claude/code-review.md` | Review checklist (lint, error handling, unsafe, docs, deps) |
 | `.claude/crate-workflow.md` | Step-by-step procedure to add a crate |
-| `.claude/execution-order.md` | Branching strategy for crate groups |
+| `.claude/execution-order.md` | What order to build things in, and one PR per what |
