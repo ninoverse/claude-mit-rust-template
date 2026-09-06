@@ -73,6 +73,7 @@ cargo install --locked cargo-nextest cargo-watch cargo-deny cargo-audit
 
 Use your file-reading capabilities to read the exact rules in the `.claude/` directory **before** executing any of the following tasks:
 
+- **Any change that ends in a PR:** Read `.claude/git-flow.md` **first** — it defines the branch → commit → PR loop everything else fits inside
 - **Committing code:** Read `.claude/commit-conventions.md`
 - **Creating branches:** Read `.claude/branch-naming.md`
 - **Reviewing PRs:** Read `.claude/code-review.md`

@@ -98,38 +98,26 @@ other-crate = { path = "../other-crate" }
 
 ### 8. Verification gate
 
-All three must pass before committing:
+All four must pass, with zero warnings, before committing:
 
 ```bash
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo nextest run --workspace        # falls back to `cargo test --workspace`
+cargo deny check
 ```
 
-### 9. Commit + push + draft PR
+### 9. Commit + push + hand over the PR
 
 ```
 feat(<crate>): add <name> crate
 ```
 
-One crate per commit. Never batch multiple crates in one commit.
+One crate per commit, one commit per branch. Never batch multiple crates.
 
-- Push the commit to the current group branch.
-- If this is the **group's first commit**: open a draft PR immediately.
-- If the draft PR already exists: just push to it.
-- **Stop.** Ask before starting the next crate.
+- Push the branch: `git push -u origin feat/<name>`.
+- Output the PR title and description (`.claude/pr-guidelines.md`). Do not open
+  the PR — the user does that.
+- **Stop.** Wait for the merge, then start the next crate from a fresh `main`.
 
----
-
-## Group verification gate
-
-Run before marking any group PR ready for review:
-
-```bash
-cargo fmt --all -- --check
-cargo clippy --workspace --all-targets --all-features -- -D warnings
-cargo nextest run --workspace
-cargo deny check
-```
-
-All four must pass cleanly with zero warnings.
+The full loop is in `.claude/git-flow.md`.
