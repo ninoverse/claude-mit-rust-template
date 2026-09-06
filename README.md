@@ -17,13 +17,17 @@ files already wired up.
 | `.cargo/config.toml` | Cargo aliases mirroring the justfile, plus a commented faster-linker block. |
 | `.github/workflows/ci.yml` | The four gates as separate jobs, plus an MSRV job and a coverage artifact. |
 | `.github/workflows/audit.yml` | Weekly `cargo audit` + `cargo deny check advisories` on a cron. |
+| `Dockerfile` | Multi-stage build via `cargo-chef`. Stages: `chef`, `planner`, `builder`, `dev`, `runtime`. |
+| `compose.yaml` | Local dev container + named volumes for `target/` and the cargo registry. |
+| `.dockerignore` | Keeps `target/` and `.git/` out of the build context. |
+| `.devcontainer/` | VS Code / Codespaces config reusing the `dev` stage. |
 | `rust-toolchain.toml` | Pins channel = `stable` so every contributor auto-pulls the latest stable Rust. |
 | `rustfmt.toml` | Format config (edition 2024, 100-col, module-granular imports). |
 | `clippy.toml` | MSRV pin for clippy lints. |
 | `deny.toml` | `cargo-deny` config: allowed licenses, advisory denials, source restrictions. |
 | `.gitignore` | Ignores `target/`. |
 | `crates/` | Workspace member dir — add crates here via `cargo new --lib crates/<name>`. |
-| `crates/example/` | Placeholder crate. A workspace with zero members is a hard cargo error, so this keeps the gates green on a fresh clone. Delete it *after* adding your first real crate. |
+| `crates/example/` | Placeholder crate (lib + bin). A workspace with zero members is a hard cargo error, so this keeps the gates green on a fresh clone and gives the Dockerfile something to build. Delete it *after* adding your first real crate. |
 | `CLAUDE.md` | Top-level rules surfaced to Claude Code. |
 | `.claude/*.md` | Per-task rule files (see table below). |
 | `.claude/settings.json` | Permission allowlist + hooks: rustfmt on save, `cargo check` when Claude stops. |
@@ -73,6 +77,72 @@ just audit      # CVE check
 No `just`? `.cargo/config.toml` defines `cargo lint`, `cargo fmt-check` and
 `cargo check-all`. There is no `cargo ci` equivalent — a cargo alias can only
 wrap a single subcommand, so run the four gates in sequence.
+
+## Containers
+
+```bash
+docker compose up -d dev                     # start the dev container
+docker compose exec dev just ci              # run the gates inside it
+docker compose run --rm dev cargo build      # or one-shot commands
+
+just docker-build <your-bin>                 # build the runtime image
+docker compose --profile app run --rm app    # run it
+```
+
+`just docker-build` is the preferred entry point because it stamps the current
+commit onto the image as an `org.opencontainers.image.revision` label. Without
+`just`:
+
+```bash
+docker build --build-arg BIN=<your-bin> --build-arg GIT_SHA="$(git rev-parse HEAD)" .
+```
+
+<details>
+<summary><b>"failed to read current commit information" warning</b></summary>
+
+Harmless, and not caused by anything in this repo. BuildKit tries to record the
+source commit in the build's provenance attestation by shelling out to `git` on
+the client. If that call fails, it warns and carries on — the image is fine.
+
+The usual reason is running Docker through `sudo`: git refuses to operate on a
+repository owned by another user ("dubious ownership"), so the check fails as
+root even though it works as you. It also happens in CI checkouts with no
+`.git`.
+
+The OCI label above is unaffected, since the SHA is passed in explicitly — so
+you keep commit traceability either way. To remove the warning itself, stop
+needing `sudo`:
+
+```bash
+sudo usermod -aG docker "$USER"   # then log out and back in
+```
+
+Note that docker group membership is equivalent to root on the host; [rootless
+mode](https://docs.docker.com/engine/security/rootless/) is the stricter
+alternative. To keep using `sudo` instead, tell root's git to trust the
+checkout:
+
+```bash
+sudo git config --system --add safe.directory "$PWD"
+```
+
+</details>
+
+The build uses [`cargo-chef`](https://github.com/LukeMathWalker/cargo-chef) so
+the dependency tree compiles into its own cached layer. Without it, editing one
+`.rs` file recompiles every dependency on the next build.
+
+Two things worth knowing before you change them:
+
+- **`target/` and the cargo registry live in named volumes**, not on the bind
+  mount. Putting them on the mount destroys build times — severely on macOS and
+  Windows.
+- **`BIN` defaults to `example`**, the placeholder binary. Point it at your own
+  crate and delete `crates/example`.
+
+`.devcontainer/` reuses the same `dev` stage, so opening the repo in VS Code or
+Codespaces gives you the pinned toolchain with `just`, nextest, deny and audit
+already built — no `just setup` wait.
 
 ## Rule files
 

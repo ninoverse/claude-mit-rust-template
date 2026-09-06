@@ -62,6 +62,23 @@ doc:
 release:
     cargo build --workspace --release
 
+# Build the runtime image, stamping the current commit as an OCI label.
+# Passed explicitly rather than left to BuildKit's own VCS capture, which needs
+# a working client-side git and silently yields nothing when it does not have
+# one — under `sudo` (git refuses a repo it does not own), or in a CI checkout
+# with no .git. A label is also inspectable with `docker inspect`, unlike a
+# provenance attestation.
+#
+# The fallback matters: without it, `sudo just docker-build` runs git as root,
+# git refuses the repo, and GIT_SHA becomes an empty string — an empty label
+# that looks like a real value. "unknown" is at least honest.
+docker-build bin="example":
+    docker build \
+        --build-arg BIN={{ bin }} \
+        --build-arg GIT_SHA="$(git rev-parse HEAD 2>/dev/null || echo unknown)" \
+        --tag {{ bin }}:latest \
+        .
+
 # Scaffold a crate, then follow .claude/crate-workflow.md for the rest
 new-crate name:
     cargo new --lib crates/{{ name }}
