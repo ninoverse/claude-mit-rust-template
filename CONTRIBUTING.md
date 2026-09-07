@@ -68,6 +68,22 @@ project, abstractions with a single caller, and configuration for situations tha
 have not happened yet are likely to be turned down — see the Behavioral
 Guidelines in [`CLAUDE.md`](CLAUDE.md).
 
+## Releases
+
+Merging to `main` bumps `[workspace.package].version` from the subject of the
+merged commit and pushes a matching tag — `feat` minor,
+`fix`/`perf`/`refactor`/`chore`/`docs` patch, `!` or `BREAKING CHANGE` major.
+Anything else bumps nothing. So the commit convention in
+[`.claude/commit-conventions.md`](.claude/commit-conventions.md) is not only
+documentation: it picks the version number.
+
+Nothing deploys on that tag. This is a template; the tag exists so someone can
+point at the version of it they copied. The workflow is not defined here — it
+calls [`ninoverse/.github`](https://github.com/ninoverse/.github) and needs
+organization-level app credentials.
+
+Tagging by hand competes with it rather than complementing it. Don't.
+
 ## Dependency updates
 
 Renovate opens them. It runs **centrally**, from
