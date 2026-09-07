@@ -70,6 +70,42 @@ Guidelines in [`CLAUDE.md`](CLAUDE.md).
 
 ## Dependency updates
 
-Renovate opens them. Review the changelog rather than rubber-stamping, and check
-that the MSRV job still passes — a dependency raising its own MSRV is the usual
-reason that job goes red.
+Renovate opens them, running from
+[`.github/workflows/renovate.yml`](.github/workflows/renovate.yml) on this
+repository's own Actions minutes — there is no GitHub App with write access to
+your account.
+
+Review the changelog rather than rubber-stamping, and check that the MSRV job
+still passes: a dependency raising *its* MSRV is the usual reason that job goes
+red. Majors wait for approval on the Dependency Dashboard issue; everything
+non-breaking arrives as one grouped PR on Monday. Security fixes ignore the
+schedule entirely.
+
+### One-time setup: `RENOVATE_TOKEN`
+
+The workflow needs a Personal Access Token. `GITHUB_TOKEN` cannot be used —
+pull requests opened with it deliberately do not trigger other workflows, so CI
+would never run on a dependency PR, which is the one thing that makes these safe
+to merge.
+
+Create a **fine-grained** token scoped to this repository only:
+
+| Permission | Access |
+|---|---|
+| Contents | Read and write |
+| Pull requests | Read and write |
+| Issues | Read and write *(for the Dependency Dashboard)* |
+| Workflows | Read and write *(only if Renovate should update `.github/workflows/`)* |
+
+Then:
+
+```bash
+gh secret set RENOVATE_TOKEN
+```
+
+A classic token with the `repo` scope also works, but grants far more than this
+needs. Until the secret exists the workflow fails immediately with a message
+saying so, rather than failing obscurely inside Renovate.
+
+To try it without side effects, run it from the Actions tab with **dryRun**
+checked — it logs what it would do and opens nothing.
