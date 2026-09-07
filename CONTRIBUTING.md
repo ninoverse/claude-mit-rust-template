@@ -81,6 +81,12 @@ red. Majors wait for approval on the Dependency Dashboard issue; everything
 non-breaking arrives as one grouped PR on Monday. Security fixes ignore the
 schedule entirely.
 
+Renovate is configured **not** to touch `dtolnay/rust-toolchain`. The MSRV job
+pins it to the `rust-version` in `Cargo.toml` deliberately — bumping it would
+leave the job green while it quietly stopped testing anything. Raising the MSRV
+is a deliberate edit to `Cargo.toml` and `clippy.toml` together, and the job's
+pin moves with it.
+
 ### One-time setup: `RENOVATE_TOKEN`
 
 The workflow needs a Personal Access Token. `GITHUB_TOKEN` cannot be used —

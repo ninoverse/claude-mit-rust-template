@@ -31,6 +31,23 @@
       "description": "Majors stay separate — they are the ones that need a changelog read, and the MSRV job is the usual thing they break.",
       "matchUpdateTypes": ["major"],
       "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Never touch the MSRV job's toolchain. It is pinned to the rust-version in Cargo.toml on purpose; bumping it would leave the job green while it silently stopped testing the MSRV at all. Raising the MSRV is a deliberate change made in Cargo.toml and clippy.toml together.",
+      "matchManagers": ["github-actions"],
+      "matchDepNames": ["dtolnay/rust-toolchain"],
+      "enabled": false
+    }
+  ],
+  "customManagers": [
+    {
+      "description": "The github-actions manager does not read `with:` inputs, so the pinned Renovate version is picked up from its annotation comment instead.",
+      "customType": "regex",
+      "managerFilePatterns": ["/^\\.github/workflows/[^/]+\\.ya?ml$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>[^\\s]+?)\\s+renovate-version: (?<currentValue>[^\\s]+)"
+      ],
+      "versioningTemplate": "semver"
     }
   ],
   "lockFileMaintenance": {
