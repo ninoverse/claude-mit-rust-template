@@ -17,6 +17,8 @@ files already wired up.
 | `.cargo/config.toml` | Cargo aliases mirroring the justfile, plus a commented faster-linker block. |
 | `.github/workflows/ci.yml` | The four gates as separate jobs, plus an MSRV job and a coverage artifact. |
 | `.github/workflows/audit.yml` | Weekly `cargo audit` + `cargo deny check advisories` on a cron. |
+| `.github/workflows/renovate.yml` | Self-hosted Renovate. Needs a `RENOVATE_TOKEN` secret — see CONTRIBUTING.md. |
+| `renovate.json` | Update policy: non-majors grouped weekly, majors gated, security immediate. |
 | `Dockerfile` | Multi-stage build via `cargo-chef`. Stages: `chef`, `planner`, `builder`, `dev`, `runtime`. |
 | `compose.yaml` | Local dev container + named volumes for `target/` and the cargo registry. |
 | `.dockerignore` | Keeps `target/` and `.git/` out of the build context. |

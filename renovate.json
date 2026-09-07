@@ -1,0 +1,54 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits"
+  ],
+  "timezone": "Etc/UTC",
+  "schedule": ["before 6am on monday"],
+  "labels": ["dependencies"],
+  "semanticCommitType": "chore",
+  "semanticCommitScope": "deps",
+  "commitMessageLowerCase": "auto",
+  "rangeStrategy": "bump",
+  "prConcurrentLimit": 3,
+  "prHourlyLimit": 0,
+  "packageRules": [
+    {
+      "description": "One PR a week for everything non-breaking. A PR per crate is noise, and each one costs a full CI run.",
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "non-major dependencies",
+      "groupSlug": "non-major"
+    },
+    {
+      "description": "Actions move together and are low risk; keeping them in one PR keeps the workflow diffs readable.",
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions",
+      "groupSlug": "actions"
+    },
+    {
+      "description": "Majors stay separate — they are the ones that need a changelog read, and the MSRV job is the usual thing they break.",
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    }
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on the first day of the month"],
+    "commitMessageAction": "refresh"
+  },
+  "vulnerabilityAlerts": {
+    "description": "Security fixes ignore the weekly window and the major-approval gate — waiting until Monday for a known advisory defeats the point.",
+    "labels": ["security"],
+    "schedule": ["at any time"],
+    "dependencyDashboardApproval": false
+  },
+  "cargo": {
+    "enabled": true
+  },
+  "github-actions": {
+    "enabled": true,
+    "pinDigests": false
+  }
+}
