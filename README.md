@@ -15,8 +15,8 @@ files already wired up.
 | `Cargo.toml` | Workspace root. `members = ["crates/*"]`, shared `[workspace.package]`, `[workspace.dependencies]` and `[workspace.lints]`. |
 | `justfile` | Task runner. Canonical form of every command; CI and the rules call these recipes. |
 | `.cargo/config.toml` | Cargo aliases mirroring the justfile, plus a commented faster-linker block. |
-| `.github/workflows/ci.yml` | The four gates as separate jobs, plus an MSRV job and a coverage artifact. |
-| `.github/workflows/audit.yml` | Weekly `cargo audit` + `cargo deny check advisories` on a cron. |
+| `.github/workflows/ci.yml` | Calls the org's reusable `rust-ci.yml`: four gates, an MSRV job and a coverage artifact. Sets the triggers and the MSRV. |
+| `.github/workflows/audit.yml` | Calls the org's reusable `rust-audit.yml`: `cargo audit` + `cargo deny check advisories` on a cron. |
 | `.github/workflows/renovate.yml` | Self-hosted Renovate. Needs a `RENOVATE_TOKEN` secret — see CONTRIBUTING.md. |
 | `renovate.json` | Update policy: non-majors grouped weekly, majors gated, security immediate. |
 | `Dockerfile` | Multi-stage build via `cargo-chef`. Stages: `chef`, `planner`, `builder`, `dev`, `runtime`. |
@@ -64,6 +64,25 @@ rm -rf crates/example
 # 5. Verify the toolchain and workspace
 just ci
 ```
+
+### If you forked this
+
+`.github/workflows/` calls reusable workflows from
+[`ninoverse/.github`](https://github.com/ninoverse/.github). That repository is
+public and the calls are pinned to `@v1`, so they keep working in your fork with
+no setup — but the job definitions are then maintained by someone else.
+
+To own them outright, copy
+[`rust-ci.yml`](https://github.com/ninoverse/.github/blob/main/.github/workflows/rust-ci.yml)
+and
+[`rust-audit.yml`](https://github.com/ninoverse/.github/blob/main/.github/workflows/rust-audit.yml)
+into your own `.github/workflows/` and drop the `uses:` line. They call the same
+`just` recipes either way.
+
+Community health files (`SECURITY.md`, issue forms) also come from that
+repository. GitHub serves organization defaults only within the owning
+organization, so **your fork inherits nothing** — add your own, or GitHub will
+show none.
 
 ## Daily commands
 
