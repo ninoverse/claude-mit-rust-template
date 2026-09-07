@@ -4,6 +4,10 @@ name: Audit
 # on your side. A push trigger would never fire for them, so this runs on a
 # schedule — and on changes to the dependency set, where a new advisory could
 # arrive with the bump.
+#
+# The jobs themselves live in ninoverse/.github; this file only sets the
+# triggers.
+
 on:
   schedule:
     - cron: "0 6 * * 1" # Mondays, 06:00 UTC
@@ -23,25 +27,6 @@ on:
 permissions:
   contents: read
 
-env:
-  CARGO_TERM_COLOR: always
-
 jobs:
   audit:
-    name: cargo audit
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: taiki-e/install-action@cargo-audit
-      - uses: taiki-e/install-action@just
-      - run: just audit
-
-  advisories:
-    name: cargo deny advisories
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: taiki-e/install-action@cargo-deny
-      - run: cargo deny check advisories
+    uses: ninoverse/.github/.github/workflows/rust-audit.yml@v1

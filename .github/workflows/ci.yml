@@ -1,11 +1,20 @@
 name: CI
 
+# The gate definitions live in ninoverse/.github so every Rust repository in the
+# organization runs the same ones. This file only says *when* to run them and
+# what this workspace's MSRV is.
+#
+# The reusable workflow's contract is the justfile: it invokes `just fmt-check`,
+# `just lint`, `just test` and `just deny`, so the cargo invocation behind each
+# gate keeps exactly one definition, here in the justfile.
+
 on:
   push:
     branches: [main]
   pull_request:
 
-# One in-flight run per ref. A new push supersedes the previous run.
+# Belongs here rather than in the called workflow: inside a called workflow,
+# `github.workflow` still resolves to this caller's name.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -13,91 +22,13 @@ concurrency:
 permissions:
   contents: read
 
-env:
-  CARGO_TERM_COLOR: always
-  # Fail on warnings from rustc itself, matching the clippy gate.
-  RUSTFLAGS: -D warnings
-
 jobs:
-  # The four gates from .claude/testing-requirements.md, one job each so a
-  # failure names the gate that broke. Each calls the justfile recipe rather
-  # than repeating the cargo invocation.
-  fmt:
-    name: Gate 1 — fmt
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt
-      - uses: taiki-e/install-action@just
-      - run: just fmt-check
-
-  lint:
-    name: Gate 2 — clippy
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: clippy
-      - uses: Swatinem/rust-cache@v2
-      - uses: taiki-e/install-action@just
-      - run: just lint
-
-  test:
-    name: Gate 3 — tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-      - uses: taiki-e/install-action@just
-      - uses: taiki-e/install-action@nextest
-      - run: just test
-
-  deny:
-    name: Gate 4 — licenses and advisories
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: taiki-e/install-action@cargo-deny
-      - uses: taiki-e/install-action@just
-      - run: just deny
-
-  # rust-toolchain.toml says `stable`, so nothing else here would catch a change
-  # that breaks the rust-version promised in Cargo.toml.
-  msrv:
-    name: MSRV 1.85
-    runs-on: ubuntu-latest
-    env:
-      # rust-toolchain.toml would otherwise win and silently test stable instead.
-      # RUSTUP_TOOLCHAIN takes precedence over the toolchain file.
-      RUSTUP_TOOLCHAIN: "1.85"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.85
-      - uses: Swatinem/rust-cache@v2
-      - name: Show the toolchain actually in use
-        run: rustc --version
-      - name: Check the workspace builds on the declared MSRV
-        run: cargo check --workspace --all-targets --locked
-
-  coverage:
-    name: Coverage
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: llvm-tools-preview
-      - uses: Swatinem/rust-cache@v2
-      - uses: taiki-e/install-action@cargo-llvm-cov
-      - name: Generate HTML coverage report
-        run: cargo llvm-cov --workspace --all-features --html
-      - uses: actions/upload-artifact@v4
-        with:
-          name: coverage-html
-          path: target/llvm-cov/html/
-          retention-days: 14
+  ci:
+    # Pinned to a tag, not @main — a change to @main would land here with no
+    # pull request in this repository.
+    uses: ninoverse/.github/.github/workflows/rust-ci.yml@v1
+    with:
+      # Must match [workspace.package].rust-version in Cargo.toml. Nothing else
+      # catches a change that breaks it, because rust-toolchain.toml pins the
+      # channel to `stable`.
+      msrv: "1.85"
