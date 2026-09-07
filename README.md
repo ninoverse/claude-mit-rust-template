@@ -17,6 +17,7 @@ files already wired up.
 | `.cargo/config.toml` | Cargo aliases mirroring the justfile, plus a commented faster-linker block. |
 | `.github/workflows/ci.yml` | Calls the org's reusable `rust-ci.yml`: four gates, an MSRV job and a coverage artifact. Sets the triggers and the MSRV. |
 | `.github/workflows/audit.yml` | Calls the org's reusable `rust-audit.yml`: `cargo audit` + `cargo deny check advisories` on a cron. |
+| `.github/workflows/bump-version.yml` | Calls the org's `rust-bump-version.yml`: reads the merged commit's type, bumps the workspace version, pushes a tag. Nothing deploys on it. |
 | `renovate.json` | One line extending the org's shared preset. Renovate runs centrally; there is no workflow or token here. |
 | `Dockerfile` | Multi-stage build via `cargo-chef`. Stages: `chef`, `planner`, `builder`, `dev`, `runtime`. |
 | `compose.yaml` | Local dev container + named volumes for `target/` and the cargo registry. |
