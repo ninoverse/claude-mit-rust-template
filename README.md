@@ -25,7 +25,13 @@ files already wired up.
 | `rustfmt.toml` | Format config (edition 2024, 100-col, module-granular imports). |
 | `clippy.toml` | MSRV pin for clippy lints. |
 | `deny.toml` | `cargo-deny` config: allowed licenses, advisory denials, source restrictions. |
-| `.gitignore` | Ignores `target/`. |
+| `.gitignore` | Ignores `target/`, coverage artefacts and secrets. **Not** `Cargo.lock` — see below. |
+| `.editorconfig` | Indentation and newline rules for editors without rust-analyzer. |
+| `CONTRIBUTING.md` | Setup, the git flow, the gates — the short version of the `.claude/` rules. |
+| `SECURITY.md` | Private disclosure process and what counts as in scope for a template. |
+| `.github/CODEOWNERS` | Review ownership, weighted toward the rule files and CI. |
+| `.github/pull_request_template.md` | The same What/Why/How/Testing template `.claude/pr-guidelines.md` specifies. |
+| `.github/ISSUE_TEMPLATE/` | Bug and feature forms. |
 | `crates/` | Workspace member dir — add crates here via `cargo new --lib crates/<name>`. |
 | `crates/example/` | Placeholder crate (lib + bin). A workspace with zero members is a hard cargo error, so this keeps the gates green on a fresh clone and gives the Dockerfile something to build. Delete it *after* adding your first real crate. |
 | `CLAUDE.md` | Top-level rules surfaced to Claude Code. |
@@ -37,7 +43,7 @@ files already wired up.
 
 ```bash
 # 1. Clone and rename
-git clone https://github.com/ninoverse/claude_mit_rust_template my-project
+git clone https://github.com/ninoverse/claude-mit-rust-template my-project
 cd my-project
 rm -rf .git && git init
 
@@ -143,6 +149,18 @@ Two things worth knowing before you change them:
 `.devcontainer/` reuses the same `dev` stage, so opening the repo in VS Code or
 Codespaces gives you the pinned toolchain with `just`, nextest, deny and audit
 already built — no `just setup` wait.
+
+## `Cargo.lock` is committed
+
+Deliberately, and it is the right default for this template. The old advice to
+ignore it for libraries was dropped by the Cargo team: committing it makes CI
+reproducible, makes `--locked` meaningful, and lets `cargo audit` tell you what
+you are actually building. Consumers of a published library ignore your lockfile
+anyway, so there is no downside to keeping it.
+
+The MSRV job and every `--locked` build in CI depend on it being present and
+current. If a dependency change leaves it stale, CI fails rather than silently
+resolving something different.
 
 ## Rule files
 
