@@ -1,8 +1,0 @@
-blank_issues_enabled: false
-contact_links:
-  - name: Security vulnerability
-    url: https://github.com/ninoverse/claude-mit-rust-template/security/advisories/new
-    about: Report privately. Do not open a public issue — see SECURITY.md.
-# If you enable Discussions on this repository, add a link here for questions
-# that are not a concrete bug or proposal. Omitted while it is turned off, since
-# the link would 404.

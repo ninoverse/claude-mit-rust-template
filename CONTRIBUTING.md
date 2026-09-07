@@ -70,10 +70,10 @@ Guidelines in [`CLAUDE.md`](CLAUDE.md).
 
 ## Dependency updates
 
-Renovate opens them, running from
-[`.github/workflows/renovate.yml`](.github/workflows/renovate.yml) on this
-repository's own Actions minutes — there is no GitHub App with write access to
-your account.
+Renovate opens them. It runs **centrally**, from
+[`ninoverse/.github`](https://github.com/ninoverse/.github), so there is no
+workflow and no token in this repository. `renovate.json` here is one line
+extending the shared preset; deleting it would opt this repository out.
 
 Review the changelog rather than rubber-stamping, and check that the MSRV job
 still passes: a dependency raising *its* MSRV is the usual reason that job goes
@@ -81,37 +81,25 @@ red. Majors wait for approval on the Dependency Dashboard issue; everything
 non-breaking arrives as one grouped PR on Monday. Security fixes ignore the
 schedule entirely.
 
-Renovate is configured **not** to touch `dtolnay/rust-toolchain`. The MSRV job
-pins it to the `rust-version` in `Cargo.toml` deliberately — bumping it would
-leave the job green while it quietly stopped testing anything. Raising the MSRV
-is a deliberate edit to `Cargo.toml` and `clippy.toml` together, and the job's
-pin moves with it.
+The shared preset is configured **not** to touch `dtolnay/rust-toolchain`. The
+MSRV job pins it to the `rust-version` in `Cargo.toml` deliberately — bumping it
+would leave the job green while it quietly stopped testing anything. Raising the
+MSRV is a deliberate edit to `Cargo.toml` and `clippy.toml` together, and the
+job's pin moves with it.
 
-### One-time setup: `RENOVATE_TOKEN`
+Anything that should change for *every* project — the schedule, the grouping,
+the major-approval gate — belongs in the org preset, not here. Overriding it
+locally is possible but reintroduces exactly the drift centralizing removed.
 
-The workflow needs a Personal Access Token. `GITHUB_TOKEN` cannot be used —
-pull requests opened with it deliberately do not trigger other workflows, so CI
-would never run on a dependency PR, which is the one thing that makes these safe
-to merge.
+## If you forked this
 
-Create a **fine-grained** token scoped to this repository only:
+Two things in this repository point at `ninoverse` and will not work as-is:
 
-| Permission | Access |
-|---|---|
-| Contents | Read and write |
-| Pull requests | Read and write |
-| Issues | Read and write *(for the Dependency Dashboard)* |
-| Workflows | Read and write *(only if Renovate should update `.github/workflows/`)* |
+- `renovate.json` extends `github>ninoverse/.github`. Replace it with your own
+  policy, or point it at your own preset.
+- `.github/workflows/` calls reusable workflows from that same repository. They
+  are public and pinned to `@v1`, so they keep working — see the README for how
+  to vendor them instead.
 
-Then:
-
-```bash
-gh secret set RENOVATE_TOKEN
-```
-
-A classic token with the `repo` scope also works, but grants far more than this
-needs. Until the secret exists the workflow fails immediately with a message
-saying so, rather than failing obscurely inside Renovate.
-
-To try it without side effects, run it from the Actions tab with **dryRun**
-checked — it logs what it would do and opens nothing.
+`SECURITY.md` and the issue forms are **not** in this repository; they come from
+the organization defaults, which a fork does not inherit. Add your own.
