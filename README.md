@@ -17,8 +17,7 @@ files already wired up.
 | `.cargo/config.toml` | Cargo aliases mirroring the justfile, plus a commented faster-linker block. |
 | `.github/workflows/ci.yml` | Calls the org's reusable `rust-ci.yml`: four gates, an MSRV job and a coverage artifact. Sets the triggers and the MSRV. |
 | `.github/workflows/audit.yml` | Calls the org's reusable `rust-audit.yml`: `cargo audit` + `cargo deny check advisories` on a cron. |
-| `.github/workflows/renovate.yml` | Self-hosted Renovate. Needs a `RENOVATE_TOKEN` secret — see CONTRIBUTING.md. |
-| `renovate.json` | Update policy: non-majors grouped weekly, majors gated, security immediate. |
+| `renovate.json` | One line extending the org's shared preset. Renovate runs centrally; there is no workflow or token here. |
 | `Dockerfile` | Multi-stage build via `cargo-chef`. Stages: `chef`, `planner`, `builder`, `dev`, `runtime`. |
 | `compose.yaml` | Local dev container + named volumes for `target/` and the cargo registry. |
 | `.dockerignore` | Keeps `target/` and `.git/` out of the build context. |
@@ -30,16 +29,26 @@ files already wired up.
 | `.gitignore` | Ignores `target/`, coverage artefacts and secrets. **Not** `Cargo.lock` — see below. |
 | `.editorconfig` | Indentation and newline rules for editors without rust-analyzer. |
 | `CONTRIBUTING.md` | Setup, the git flow, the gates — the short version of the `.claude/` rules. |
-| `SECURITY.md` | Private disclosure process and what counts as in scope for a template. |
 | `.github/CODEOWNERS` | Review ownership, weighted toward the rule files and CI. |
 | `.github/pull_request_template.md` | The same What/Why/How/Testing template `.claude/pr-guidelines.md` specifies. |
-| `.github/ISSUE_TEMPLATE/` | Bug and feature forms. |
 | `crates/` | Workspace member dir — add crates here via `cargo new --lib crates/<name>`. |
 | `crates/example/` | Placeholder crate (lib + bin). A workspace with zero members is a hard cargo error, so this keeps the gates green on a fresh clone and gives the Dockerfile something to build. Delete it *after* adding your first real crate. |
 | `CLAUDE.md` | Top-level rules surfaced to Claude Code. |
 | `.claude/*.md` | Per-task rule files (see table below). |
 | `.claude/settings.json` | Permission allowlist + hooks: rustfmt on save, `cargo check` when Claude stops. |
 | `.claude/commands/` | Project slash commands: `/gates`, `/new-crate`. |
+
+### Not in this repository
+
+`SECURITY.md`, `CODE_OF_CONDUCT.md` and `.github/ISSUE_TEMPLATE/` come from
+[`ninoverse/.github`](https://github.com/ninoverse/.github), which GitHub serves
+as the default to every repository in the organization that has none of its own.
+They are not here because both hardcode `ninoverse` URLs, so a copy would be
+wrong for anyone else anyway.
+
+`CONTRIBUTING.md` and the pull request template stay, because overriding is
+all-or-nothing per file and both are dense with Rust and `just` specifics the
+generic versions deliberately drop.
 
 ## Bootstrap a project from this template
 
