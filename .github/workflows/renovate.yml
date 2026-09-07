@@ -61,9 +61,17 @@ jobs:
         if: inputs.dryRun
         run: echo "RENOVATE_DRY_RUN=full" >> "$GITHUB_ENV"
 
+      # The action and the tool it runs are versioned independently: this action
+      # is v46, while Renovate itself is at 44.x. Left alone the action supplies
+      # its own default (a floating major), so the version actually doing the
+      # work is invisible here and changes without a diff. Pinning it exactly
+      # makes it reviewable; the annotation below is what lets Renovate keep the
+      # pin current, via the customManager in renovate.json.
       - uses: renovatebot/github-action@v46.2.6
         with:
           token: ${{ secrets.RENOVATE_TOKEN }}
+          # renovate: datasource=docker depName=ghcr.io/renovatebot/renovate
+          renovate-version: 44.66.1
         env:
           # Only this repository. Without it Renovate autodiscovers every repo
           # the token can reach, which is far more than intended.
