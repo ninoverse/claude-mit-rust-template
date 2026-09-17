@@ -9,9 +9,13 @@
 # Every file, unless overridden below.
 *                       @nicolapasqua99
 
-# The rule files are the product here — a change to them changes how every
-# project cloned from this template behaves.
+# The agent rules are the product here — a change changes how every project
+# cloned from this template behaves. They are composed rather than written, so
+# the profile that selects them matters most: it decides the whole tree below.
+/.agentprofile.yml      @nicolapasqua99
+/AGENTS.md              @nicolapasqua99
 /CLAUDE.md              @nicolapasqua99
+/.agents/               @nicolapasqua99
 /.claude/               @nicolapasqua99
 
 # Supply chain and CI: a change here can weaken the merge gates.
