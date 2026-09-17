@@ -29,15 +29,17 @@ files already wired up.
 | `deny.toml` | `cargo-deny` config: allowed licenses, advisory denials, source restrictions. |
 | `.gitignore` | Ignores `target/`, coverage artefacts and secrets. **Not** `Cargo.lock` — see below. |
 | `.editorconfig` | Indentation and newline rules for editors without rust-analyzer. |
-| `CONTRIBUTING.md` | Setup, the git flow, the gates — the short version of the `.claude/` rules. |
+| `CONTRIBUTING.md` | Setup, the git flow, the gates — the short version of the `.agents/` rules. |
 | `.github/CODEOWNERS` | Review ownership, weighted toward the rule files and CI. |
-| `.github/pull_request_template.md` | The same What/Why/How/Testing template `.claude/pr-guidelines.md` specifies. |
+| `.github/pull_request_template.md` | The same What/Why/How/Testing template `.agents/pr-guidelines.md` specifies. |
 | `crates/` | Workspace member dir — add crates here via `cargo new --lib crates/<name>`. |
 | `crates/example/` | Placeholder crate (lib + bin). A workspace with zero members is a hard cargo error, so this keeps the gates green on a fresh clone and gives the Dockerfile something to build. Delete it *after* adding your first real crate. |
-| `CLAUDE.md` | Top-level rules surfaced to Claude Code. |
-| `.claude/*.md` | Per-task rule files (see table below). |
+| `.agentprofile.yml` | The one file here a human writes. Everything below is composed from it (see below). |
+| `AGENTS.md` | The composed always-on rules, plus an index pointing at the rest. |
+| `CLAUDE.md` | A two-line `@AGENTS.md` import, plus anything genuinely Claude-specific. |
+| `.agents/*.md` | Agent-neutral rule files, read on demand. |
 | `.claude/settings.json` | Permission allowlist + hooks: rustfmt on save, `cargo check` when Claude stops. |
-| `.claude/commands/` | Project slash commands: `/gates`, `/new-crate`. |
+| `.claude/skills/` | Claude Code skills: `/gates`, `/new-crate`, `/why`. |
 
 ### Not in this repository
 
@@ -195,14 +197,21 @@ resolving something different.
 
 ## Rule files
 
-| File | Purpose |
-|------|---------|
-| `.claude/git-flow.md` | The branch → commit → PR loop. One branch in flight, no stacked PRs |
-| `.claude/branch-naming.md` | Branch prefix and format conventions |
-| `.claude/commit-conventions.md` | Conventional Commits rules |
-| `.claude/pr-guidelines.md` | PR title, description template, size guidance |
-| `.claude/testing-requirements.md` | Test gates (fmt, clippy, nextest, deny) |
-| `.claude/file-naming.md` | Workspace and per-crate layout |
-| `.claude/code-review.md` | Review checklist (lint, error handling, unsafe, docs, deps) |
-| `.claude/crate-workflow.md` | Step-by-step procedure to add a crate |
-| `.claude/execution-order.md` | What order to build things in, and one PR per what |
+The rules are not written here. They are composed from
+[`ninoverse/agent-config-sync`](https://github.com/ninoverse/agent-config-sync)
+by `agentcfg`, at the version this repository pins:
+
+| File | What it is |
+|------|------------|
+| `.agentprofile.yml` | This repo's value on each axis — language, deployment, concerns — and the `config_version` it pins. The only file in the list a human edits. |
+| `AGENTS.md` | Everything loaded in every session, plus one index line per rule that is not. Read by every agent that reads AGENTS.md. |
+| `CLAUDE.md` | A two-line `@AGENTS.md` import, plus anything true only for Claude Code. |
+| `.agents/*.md` | One file per on-demand rule: the git flow, commit conventions, the crate workflow, the review checklist. Agent-neutral. |
+| `.claude/skills/` | The task rules again, as Claude Code skills — `/gates`, `/new-crate`, `/why`. One fragment, two renderings. |
+
+Every composed block opens with a provenance comment naming the fragment it came
+from, so a rule is always traceable to one file upstream. To find which,
+run `agentcfg why "<phrase>"`. To change a rule for every repository, open a pull
+request against that fragment. To change it for this one only, put it outside the
+`<!-- agentcfg:start -->` / `<!-- agentcfg:end -->` markers — regeneration never
+touches what sits outside them.
