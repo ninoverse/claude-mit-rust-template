@@ -1,5 +1,5 @@
 <!-- agentcfg:start -->
-<!-- core/code-review.md · v0.17.0 -->
+<!-- core/code-review.md · v0.17.2 -->
 # Code review
 
 The checks every change gets, whatever the language. The language's own review

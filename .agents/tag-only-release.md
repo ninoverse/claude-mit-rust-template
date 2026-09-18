@@ -1,5 +1,5 @@
 <!-- agentcfg:start -->
-<!-- deployment/tag-only/release.md · v0.17.0 -->
+<!-- deployment/tag-only/release.md · v0.17.2 -->
 # Releases
 
 A release tag here is a marker, not a deploy. `bump-version.yml` tags every push

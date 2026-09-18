@@ -1,7 +1,7 @@
 Scaffolding for new Rust cargo-workspace projects: the latest stable toolchain, the four merge gates wired to CI, and the agent rules already in place. Fork or copy it to start a project.
 
 <!-- agentcfg:start -->
-<!-- language/rust/tooling.md · v0.17.0 -->
+<!-- language/rust/tooling.md · v0.17.2 -->
 # Build and test commands
 
 **Toolchain:** Rust is pinned via `rust-toolchain.toml` (channel = `stable`). Every contributor automatically gets the latest stable toolchain on first `cargo` invocation. Required components: `rustfmt`, `clippy`.
@@ -43,7 +43,7 @@ subcommand, so the four gates have to be run in sequence.
 
 **MSRV:** Declared in `[workspace.package].rust-version`, `clippy.toml`, and the `msrv` input in `.github/workflows/ci.yml`. Raising it means editing all of them together; the MSRV job compares the last against the first and fails a partial bump. Do not bump it incidentally.
 
-<!-- core/behavior.md · v0.17.0 -->
+<!-- core/behavior.md · v0.17.2 -->
 # Behavioral guidelines
 
 **Maintain the Build:** Never leave the codebase in a state where build, lint,
@@ -83,7 +83,7 @@ your work before concluding a task.
 - Transform tasks into verifiable goals (e.g., "Add validation" → "Write tests for invalid inputs, then make them pass").
 - For multi-step tasks, state a brief plan and verify each step independently.
 
-<!-- concerns/template/rules.md · v0.17.0 -->
+<!-- concerns/template/rules.md · v0.17.2 -->
 # Template repository
 
 This repository is a GitHub template: new projects start as a copy of it, and
@@ -99,7 +99,7 @@ every copy inherits everything here.
 - A project created from this template removes `template` from `concerns` in its
   `.agentprofile.yml`.
 
-<!-- agentcfg:index · v0.17.0 -->
+<!-- agentcfg:index · v0.17.2 -->
 # Extended rules
 
 Read these when they apply; they are not loaded by default.
