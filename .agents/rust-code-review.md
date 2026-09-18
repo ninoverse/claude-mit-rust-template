@@ -1,5 +1,5 @@
 <!-- agentcfg:start -->
-<!-- language/rust/code-review.md · v0.17.0 -->
+<!-- language/rust/code-review.md · v0.17.2 -->
 # Rust code review
 
 Read alongside *Code review*, which holds the checks every language shares.
