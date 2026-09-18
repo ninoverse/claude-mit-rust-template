@@ -1,5 +1,5 @@
 <!-- agentcfg:start -->
-<!-- core/branch-naming.md · v0.17.2 -->
+<!-- core/branch-naming.md · v0.17.6 -->
 # Branch naming
 
 ## Format
@@ -18,7 +18,7 @@
 |--------|-------------|
 | `feat/` | New feature |
 | `fix/` | Bug fix |
-| `refactor/` | Refactor with no behaviour change |
+| `refactor/` | Refactor with no behavior change |
 | `chore/` | Tooling, deps, CI, config |
 | `docs/` | Documentation only |
 | `wip/` | Exploratory / work-in-progress (not for PRs) |

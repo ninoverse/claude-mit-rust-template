@@ -1,5 +1,5 @@
 <!-- agentcfg:start -->
-<!-- language/rust/testing.md · v0.17.2 -->
+<!-- language/rust/testing.md · v0.17.6 -->
 # Testing instructions
 
 ## Before merging any change
