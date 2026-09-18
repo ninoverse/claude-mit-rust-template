@@ -1,5 +1,5 @@
 <!-- agentcfg:start -->
-<!-- core/execution-order.md · v0.17.2 -->
+<!-- core/execution-order.md · v0.17.6 -->
 # Execution order
 
 Defines the branch / PR structure for work in this workspace.

@@ -1,5 +1,5 @@
 <!-- agentcfg:start -->
-<!-- language/rust/tasks/new-unit.md · v0.17.2 -->
+<!-- language/rust/tasks/new-unit.md · v0.17.6 -->
 # Adding a crate
 
 The exact procedure for adding or modifying a single crate in this Cargo
