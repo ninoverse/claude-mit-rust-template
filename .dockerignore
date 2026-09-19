@@ -5,15 +5,22 @@ target/
 
 .git/
 .github/
+.agents/
 .claude/
 .devcontainer/
 .vscode/
+
+# The agentcfg binary `just agentcfg` fetches. Gitignored, so it exists only
+# on a working laptop — which is exactly where `docker build` runs.
+.agentcfg/
 
 Dockerfile
 .dockerignore
 compose.yaml
 README.md
+AGENTS.md
 CLAUDE.md
+CONTRIBUTING.md
 LICENSE
 
 # Never let secrets into an image layer.
