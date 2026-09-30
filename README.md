@@ -15,7 +15,7 @@ files already wired up.
 | `Cargo.toml` | Workspace root. `members = ["crates/*"]`, shared `[workspace.package]`, `[workspace.dependencies]` and `[workspace.lints]`. |
 | `justfile` | Task runner. Canonical form of every command; CI and the rules call these recipes. |
 | `.cargo/config.toml` | Cargo aliases mirroring the justfile, plus a commented faster-linker block. |
-| `.github/workflows/ci.yml` | Calls the org's reusable `rust-ci.yml`: four gates, an MSRV job and a coverage artifact. Sets the triggers and the MSRV. |
+| `.github/workflows/ci.yml` | Calls the org's reusable `rust-ci.yml`: four gates, an MSRV job and a coverage artifact; and `actionlint.yml`, which lints the workflow files. Sets the triggers and the MSRV. |
 | `.github/workflows/audit.yml` | Calls the org's reusable `rust-audit.yml`: `cargo audit` + `cargo deny check advisories` on a cron. |
 | `.github/workflows/bump-version.yml` | Calls the org's `rust-bump-version.yml`: reads the merged commit's type, bumps the workspace version, pushes a tag. Nothing deploys on it. |
 | `renovate.json` | One line extending the org's shared preset. Renovate runs centrally; there is no workflow or token here. |
@@ -90,6 +90,9 @@ and
 [`rust-audit.yml`](https://github.com/ninoverse/.github/blob/main/.github/workflows/rust-audit.yml)
 into your own `.github/workflows/` and drop the `uses:` line. They call the same
 `just` recipes either way.
+`ci.yml` also calls
+[`actionlint.yml`](https://github.com/ninoverse/.github/blob/main/.github/workflows/actionlint.yml),
+which lints the workflow files and calls no recipe; copy it the same way.
 
 Community health files (`SECURITY.md`, issue forms) also come from that
 repository. GitHub serves organization defaults only within the owning
