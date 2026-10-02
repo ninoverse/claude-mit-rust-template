@@ -25,7 +25,7 @@ is already built into the image.
 
 ## The loop
 
-One branch, one commit, one PR, merged before the next begins. No stacked PRs.
+One branch, one PR, merged before the next begins. No stacked PRs.
 Full rules in [`.agents/git-flow.md`](.agents/git-flow.md).
 
 ```bash
@@ -37,8 +37,8 @@ git commit                                   # .agents/commit-conventions.md
 git push -u origin <branch>
 ```
 
-Then open a PR using the template. If Claude Code prepared the branch, it stops
-before opening the PR by design — that step is yours.
+Then open a PR using the template. Who opens a PR and who merges it is in
+[`.agents/pr-guidelines.md`](.agents/pr-guidelines.md).
 
 ## The four gates
 
@@ -73,11 +73,10 @@ Guidelines in [`AGENTS.md`](AGENTS.md).
 ## Releases
 
 Merging to `main` bumps `[workspace.package].version` from the subject of the
-merged commit and pushes a matching tag — `feat` minor,
-`fix`/`perf`/`refactor`/`chore`/`docs` patch, `!` or `BREAKING CHANGE` major.
-Anything else bumps nothing. So the commit convention in
-[`.agents/commit-conventions.md`](.agents/commit-conventions.md) is not only
-documentation: it picks the version number.
+squash commit, which is the PR title, and pushes a matching tag.
+[`.agents/commit-conventions.md`](.agents/commit-conventions.md) says which
+subject cuts which release, so the convention is not only documentation: it
+picks the version number.
 
 Nothing deploys on that tag. This is a template; the tag exists so someone can
 point at the version of it they copied. The workflow is not defined here — it
